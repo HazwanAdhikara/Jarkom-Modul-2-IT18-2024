@@ -454,3 +454,120 @@ cakra IN    A	      192.242.1.5        ; IP Bedahulu # Tambahkan ini dan sesuaik
 1. lakukan testing dengan ping subdomainnya
 
    ![alt text](./assets/image-15.png)
+
+## Soal 9
+
+Karena terjadi serangan DDOS oleh shikanoko nokonoko koshitantan (NUN), sehingga sistem komunikasinya terhalang. Untuk melindungi warga, kita diperlukan untuk membuat sistem peringatan dari siren man oleh Frekuensi Freak dan memasukkannya ke subdomain panah.pasopati.xxxx.com dalam folder panah dan pastikan dapat diakses secara mudah dengan menambahkan alias www.panah.pasopati.xxxx.com dan mendelegasikan subdomain tersebut ke Majapahit dengan alamat IP menuju radar di Kotalingga.
+
+### Sriwijaya
+
+1. kita perlu menambahkan beberapa config maka lakukan `nano /etc/bind/jarkom/pasopati.it18.com` dan sesuaikan dengan ini
+
+```bash
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@    IN    SOA    pasopati.it18.com. root.pasopati.it18.com. (
+                  2        ; Serial
+             604800        ; Refresh
+              86400        ; Retry
+            2419200        ; Expire
+             604800 )    ; Negative Cache TTL
+;
+@       IN      NS      pasopati.it18.com.
+@       IN      A       192.242.2.4             ; IP Kotalingga
+www     IN      CNAME   pasopati.it18.com.
+ns1     IN      A       192.242.2.2             ; IP Majapahit
+panah   IN      NS      ns1
+```
+
+> Tambahkan 2 baris paling bawah, yang dimana `ns1` adalah IP Majapahit
+
+2. pada `/etc/bind/named.conf.options` tambahkan `allow-query{any;};` kedalamnya, seperti ini
+
+```bash
+options {
+        directory "/var/cache/bind";
+        allow-query{any;}; # Tambahkan ini
+
+        auth-nxdomain no;    # conform to RFC1035
+        listen-on-v6 { any; };
+};
+```
+
+3. juga pada `/etc/bind/named.conf.local`, sesuaian dengan ini
+
+```bash
+zone "pasopati.it18.com" {
+    type master;
+    notify yes;
+    also-notify { 192.242.2.2; }; // IP Majapahit
+    allow-transfer { 192.242.2.2; }; // IP Majapahit
+    file "/etc/bind/jarkom/pasopati.it18.com";
+};
+```
+
+> yang ditambahkan adalah IP Majapahit
+
+4. restart `service bind9 restart`
+
+### Majapahit
+
+1. sesuaikan juga di majapahit `nano /etc/bind/named.conf.options`
+
+```bash
+options {
+        directory "/var/cache/bind";
+        allow-query{any;}; # Tambahkan ini juga
+
+        auth-nxdomain no;    # conform to RFC1035
+        listen-on-v6 { any; };
+};
+```
+
+2. tambahkan zone baru pada `/etc/bind/named.conf.local`
+
+```bash
+zone "panah.pasopati.it18.com" {
+        type master;
+        file "/etc/bind/panah/panah.pasopati.it18.com";
+};
+```
+
+3. buat folder panah
+
+```bash
+mkdir /etc/bind/panah
+```
+
+4. lalu config `/etc/bind/panah/panah.pasopati.it18.com` dengan ini,
+
+```bash
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     panah.pasopati.it18.com. root.panah.pasopati.it18.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      panah.pasopati.it18.com.
+@       IN      A       192.242.2.4                     ; IP Kotalingga
+www     IN      CNAME   panah.pasopati.it18.com
+```
+
+> dengan IP Kotalingga
+
+5. jangan lupa restart `service bind9 restart`
+
+### Client
+
+1. pastikan nameserver sudah sesuai pada `/etc/resolve.conf`
+
+2. kita test dengan ping subdomainnya
+
+![alt text](./assets/image-16.png)
