@@ -129,7 +129,14 @@ iface eth0 inet static
 
 ## Shell Script
 
-[[Click here](https://github.com/HazwanAdhikara/Jarkom-Modul-2-IT18-2024/blob/main/setup.sh)]
+**Cara menggunakannya :**
+
+- `nano setup.sh` pada root terminal
+- isi dengan _setup.sh_ pada [[Link ini](https://github.com/HazwanAdhikara/Jarkom-Modul-2-IT18-2024/blob/main/setup.sh)] dan save
+- lalu, ketik `chmod +x setup.sh` pada terminal
+- Setelah itu run dengan `./setup.sh ARGV`, ARGV sesuaikan dengan apa yang ingin anda jalankan.
+
+> misal anda ingin setup Nusantara sebagai Router, maka run dengan `./setup.sh router`. dan untuk run lainnya silahkan lihat di link tadi.
 
 ## Soal 1
 
