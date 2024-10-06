@@ -153,7 +153,7 @@ atau
 > `./setup.sh router`
 
 2. lalu cek nameserver yang akan digunakan pada Node lainnya
-   ![alt text](image.png)
+   ![alt text](./assets/image.png)
 
 3. Pada Terminal **`Sriwijaya`** kita perlu membuatnya menjadi DNS Master, dengan melakukan steps ini:
 
@@ -172,11 +172,11 @@ Karena para pasukan membutuhkan koordinasi untuk melancarkan serangannya, maka b
 - `nano /etc/bind/named.conf.local`
   dan config seperti ini:
 
-  ![alt text](image-1.png)
+  ![alt text](./assets/image-1.png)
 
 - lalu, `mkdir /etc/bind/jarkom` dan `nano /etc/bind/jarkom/sudarsana.it18.com` dan config seperti ini:
 
-  ![alt text](image-2.png)
+  ![alt text](./assets/image-2.png)
 
 - jangan lupa untuk `service bind9 restart` setiap melakukan perubahan config
 
@@ -185,14 +185,14 @@ Karena para pasukan membutuhkan koordinasi untuk melancarkan serangannya, maka b
 ### Client (Sanjaya)
 
 - jangan lupa untuk config /etc/resolve.conf sesuai yang diperlukan
-  ![alt text](image-3.png)
+  ![alt text](./assets/image-3.png)
 
   `192.242.1.3 merupakan IP Sriwijaya`
 
 - dan jangan lupa juga untuk `apt-get update` pada Client
 - setelah itu, kita bisa test ping `sudarsana.it18.com` ataupun `www.sudarsana.it18.com`
 
-![alt text](image-4.png)
+![alt text](./assets/image-4.png)
 
 ## Soal 3
 
@@ -207,11 +207,11 @@ Para pasukan juga perlu mengetahui mana titik yang akan diserang, sehingga dibut
 - `nano /etc/bind/named.conf.local`
   dan config seperti ini:
 
-  ![alt text](image-5.png)
+  ![alt text](./assets/image-5.png)
 
 - lalu, `nano /etc/bind/jarkom/pasopati.it18.com` dan config seperti ini:
 
-  ![alt text](image-6.png)
+  ![alt text](./assets/image-6.png)
 
 - jangan lupa untuk `service bind9 restart` setiap melakukan perubahan config
 
@@ -221,7 +221,7 @@ Para pasukan juga perlu mengetahui mana titik yang akan diserang, sehingga dibut
 
 - setelah itu, kita bisa test ping `pasopati.it18.com` ataupun `www.pasopati.it18.com`
 
-![alt text](image-7.png)
+![alt text](./assets/image-7.png)
 
 ## Soal 4
 
@@ -234,11 +234,11 @@ Markas pusat meminta dibuatnya domain khusus untuk menaruh informasi persenjataa
 - `nano /etc/bind/named.conf.local`
   dan config seperti ini:
 
-  ![alt text](image-8.png)
+  ![alt text](./assets/image-8.png)
 
 - lalu, `nano /etc/bind/jarkom/rujapala.it18.com` dan config seperti ini:
 
-  ![alt text](image-9.png)
+  ![alt text](./assets/image-9.png)
 
 - jangan lupa untuk `service bind9 restart` setiap melakukan perubahan config
 
@@ -248,7 +248,7 @@ Markas pusat meminta dibuatnya domain khusus untuk menaruh informasi persenjataa
 
 - setelah itu, kita bisa test ping `rujapala.it18.com` ataupun `www.rujapala.it18.com`
 
-![alt text](image-10.png)
+![alt text](./assets/image-10.png)
 
 ## Soal 5
 
@@ -266,8 +266,8 @@ Pastikan domain-domain tersebut dapat diakses oleh seluruh komputer (client) yan
 
 ### Client Anusapati
 
-![alt text](image-11.png)
+![alt text](./assets/image-11.png)
 
 ### Client Jayanagara
 
-![alt text](image-12.png)
+![alt text](./assets/image-12.png)
