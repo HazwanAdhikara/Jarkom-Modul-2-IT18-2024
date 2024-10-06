@@ -271,3 +271,186 @@ Pastikan domain-domain tersebut dapat diakses oleh seluruh komputer (client) yan
 ### Client Jayanagara
 
 ![alt text](./assets/image-12.png)
+
+## Soal 6
+
+Beberapa daerah memiliki keterbatasan yang menyebabkan hanya dapat mengakses domain secara langsung melalui alamat IP domain tersebut. Karena daerah tersebut tidak diketahui secara spesifik, pastikan semua komputer (client) dapat mengakses domain pasopati.xxxx.com melalui alamat IP Kotalingga (Notes: menggunakan pointer record).
+
+- karena `IP Kotalingga = 192.242.2.4`, Reversenya adalah `2.242.192` (4nya disimpan untuk keperluan config nantinya)
+
+### Sriwijaya
+
+1. `nano /etc/bind/named.conf.local` untuk edit config, lalu tambahkan dengan ini
+
+```bash
+zone "2.242.192.in-addr.arpa" {
+    type master;
+    file "/etc/bind/jarkom/2.242.192.in-addr.arpa";
+};
+```
+
+2. `nano /etc/bind/jarkom/2.242.192.in-addr.arpa`, lalu sesuaikan dengan config dibawah ini
+
+```bash
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     pasopati.it18.com. root.pasopati.it18.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+2.242.192.in-addr.arpa.  IN      NS      pasopati.it18.com.
+4                        IN      PTR     pasopati.it18.com.
+```
+
+> notes: angka 4 atau angka terakhir IP Kotalingga, kita gunakan diatas untuk Record PTR
+
+3. `service bind9 restart`. Karena kita baru saja melakukan perubahan pada `/etc/bind/named.conf.local`.
+
+### Client
+
+1. jangan lupa untuk add nameserver pada `/etc/resolv.conf`
+2. lakukan instalasi pada terminal `apt install dnsutils -y`
+3. untuk ngetes nya kita lakukan `host -t PTR 192.242.2.4 (IP KOTALINGGA buat ngecek)`
+   ![alt text](./assets/image-13.png)
+
+## Soal 7
+
+Akhir-akhir ini seringkali terjadi serangan brainrot ke DNS Server Utama, sebagai tindakan antisipasi kamu diperintahkan untuk membuat DNS Slave di Majapahit untuk semua domain yang sudah dibuat sebelumnya yang mengarah ke Sriwijaya.
+
+- untuk membuat DNS Slave, kita perlu config pada (Sriwijaya) DNS Master dan (Majapahit) DNS Slave.
+
+### Sriwijaya
+
+1. `nano /etc/bind/named.conf.local` lalu sesuaikan dengan ini
+
+```bash
+zone "sudarsana.it18.com" {
+    type master;
+    notify yes;
+    also-notify { 192.242.2.2; }; // IP Majapahit
+    allow-transfer { 192.242.2.2; }; // IP Majapahit
+    file "/etc/bind/jarkom/sudarsana.it18.com";
+};
+zone "pasopati.it18.com" {
+    type master;
+    notify yes;
+    also-notify { 192.242.2.2; }; // IP Majapahit
+    allow-transfer { 192.242.2.2; }; // IP Majapahit
+    file "/etc/bind/jarkom/pasopati.it18.com";
+};
+zone "rujapala.it18.com" {
+    type master;
+    notify yes;
+    also-notify { 192.242.2.2; }; // IP Majapahit
+    allow-transfer { 192.242.2.2; }; // IP Majapahit
+    file "/etc/bind/jarkom/rujapala.it18.com";
+};
+```
+
+> terlihat disitu kita menambahkan config untuk IP Majapahit
+
+2. jangan lupa restart `service bind9 restart`
+
+### (Majapahit) DNS Slave
+
+> jangan lupa untuk `echo 'nameserver 192.168.122.1' > /etc/resolv.conf`
+
+1. update dan install bind9
+
+```bash
+apt-get update
+apt-get install bind9 -y
+```
+
+2. config /etc/bind/named.conf.local seperti ini
+
+```bash
+zone "sudarsana.it18.com" {
+    type slave;
+    masters { 192.242.1.3; }; // IP Sriwijaya sbg DNS Master
+    file "/var/lib/bind/sudarsana.it18.com";
+};
+zone "pasopati.it18.com" {
+    type slave;
+    masters { 192.242.1.3; }; // IP Sriwijaya sbg DNS Master
+    file "/var/lib/bind/pasopati.it18.com";
+};
+zone "rujapala.it18.com" {
+    type slave;
+    masters { 192.242.1.3; }; // IP Sriwijaya sbg DNS Master
+    file "/var/lib/bind/rujapala.it18.com";
+};
+```
+
+3. jangan lupa untuk restart `service bind9 restart`
+
+### Testing
+
+1. pada `Sriwijaya` matikan service bind9 dengan cara
+
+```bash
+service bind9 stop
+```
+
+cek dengan,
+
+```bash
+root@Sriwijaya:~# service bind9 status
+ * bind9 is not running
+```
+
+2. pada `Client` cek _/etc/resolve.conf_ pastikan ada nameserver yang mengarah ke IP Sriwijaya dan IP Majapahit
+
+```bash
+nameserver 192.168.122.1
+nameserver 192.242.1.3 # IP Sriwijaya sbg DNS Master
+nameserver 192.242.2.2 # IP Majapahit sbg DNS Slave
+```
+
+3. pada `Client` lakukan ping kepada domain manapun yang tersedia
+
+   ![alt text](./assets/image-14.png)
+
+4. Setelah berhasil, jangan lupa untuk nyalakan bind9 lagi, masuk ke terminal `Sriwijaya`, lakukan `service bind9 start`.
+
+## Soal 8
+
+Kamu juga diperintahkan untuk membuat subdomain khusus melacak kekuatan tersembunyi di Ohio dengan subdomain cakra.sudarsana.xxxx.com yang mengarah ke Bedahulu.
+
+### Sriwijaya
+
+1. Pada `Sriwijaya`, edit `/etc/bind/jarkom/sudarsana.it18.com` menjadi seperti
+
+```bash
+root@Sriwijaya:~# cat /etc/bind/jarkom/sudarsana.it18.com
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@    IN    SOA    sudarsana.it18.com. root.sudarsana.it18.com. (
+                  2        ; Serial
+             604800        ; Refresh
+              86400        ; Retry
+            2419200        ; Expire
+             604800 )    ; Negative Cache TTL
+;
+@     IN    NS        sudarsana.it18.com.
+@     IN    A         192.242.3.2        ; IP Solok
+www   IN    CNAME     sudarsana.it18.com.
+cakra IN    A	      192.242.1.5        ; IP Bedahulu # Tambahkan ini dan sesuaikan IPnya
+```
+
+> tambahkan baris paling bawah kedalam config agar dia bisa menjadi subdomain sudarsana.it18.com
+
+2. jangan lupa restart `service bind9 restart`
+
+### Client
+
+1. lakukan testing dengan ping subdomainnya
+
+   ![alt text](./assets/image-15.png)
