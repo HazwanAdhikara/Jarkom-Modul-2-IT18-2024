@@ -129,7 +129,7 @@ iface eth0 inet static
 
 ## Shell Script
 
-[Buka File setup.sh]
+[[Click here](https://github.com/HazwanAdhikara/Jarkom-Modul-2-IT18-2024/blob/main/setup.sh)]
 
 ## Soal 1
 
@@ -145,4 +145,122 @@ atau
 
 > `./setup.sh router`
 
-2. lalu untuk cek nameserver yang akan digunakan pada
+2. lalu cek nameserver yang akan digunakan pada Node lainnya
+   ![alt text](image.png)
+
+3. Pada Terminal **`Sriwijaya`** kita perlu membuatnya menjadi DNS Master, dengan melakukan steps ini:
+
+- `echo 'nameserver 192.168.122.1' > /etc/resolv.conf`
+- `apt-get update`
+- `apt-get install bind9 -y`
+
+## Soal 2
+
+Karena para pasukan membutuhkan koordinasi untuk melancarkan serangannya, maka buatlah sebuah domain yang mengarah ke Solok dengan alamat sudarsana.xxxx.com dengan alias www.sudarsana.xxxx.com, dimana xxxx merupakan kode kelompok. Contoh: sudarsana.it01.com.
+
+1. Pembuatan domain _sudarsana.it18.com_
+
+### Sriwijaya
+
+- `nano /etc/bind/named.conf.local`
+  dan config seperti ini:
+
+  ![alt text](image-1.png)
+
+- lalu, `mkdir /etc/bind/jarkom` dan `nano /etc/bind/jarkom/sudarsana.it18.com` dan config seperti ini:
+
+  ![alt text](image-2.png)
+
+- jangan lupa untuk `service bind9 restart` setiap melakukan perubahan config
+
+2. kita dapat lakukan ping pada **terminal Client**
+
+### Client (Sanjaya)
+
+- jangan lupa untuk config /etc/resolve.conf sesuai yang diperlukan
+  ![alt text](image-3.png)
+
+  `192.242.1.3 merupakan IP Sriwijaya`
+
+- dan jangan lupa juga untuk `apt-get update` pada Client
+- setelah itu, kita bisa test ping `sudarsana.it18.com` ataupun `www.sudarsana.it18.com`
+
+![alt text](image-4.png)
+
+## Soal 3
+
+Para pasukan juga perlu mengetahui mana titik yang akan diserang, sehingga dibutuhkan domain lain yaitu pasopati.xxxx.com dengan alias www.pasopati.xxxx.com yang mengarah ke Kotalingga.
+
+// untuk nomer 3 dan 4 sama aja seperti soal 2
+
+1. pembuatan domain _pasopati.it18.com_
+
+### Sriwijaya
+
+- `nano /etc/bind/named.conf.local`
+  dan config seperti ini:
+
+  ![alt text](image-5.png)
+
+- lalu, `nano /etc/bind/jarkom/pasopati.it18.com` dan config seperti ini:
+
+  ![alt text](image-6.png)
+
+- jangan lupa untuk `service bind9 restart` setiap melakukan perubahan config
+
+2. kita dapat lakukan ping pada **terminal Client**
+
+### Client (Sanjaya)
+
+- setelah itu, kita bisa test ping `pasopati.it18.com` ataupun `www.pasopati.it18.com`
+
+![alt text](image-7.png)
+
+## Soal 4
+
+Markas pusat meminta dibuatnya domain khusus untuk menaruh informasi persenjataan dan suplai yang tersebar. Informasi dan suplai meme terbaru tersebut mengarah ke Tanjungkulai dan domain yang ingin digunakan adalah rujapala.xxxx.com dengan alias www.rujapala.xxxx.com.
+
+1. pembuatan domain _rujapala.it18.com_
+
+### Sriwijaya
+
+- `nano /etc/bind/named.conf.local`
+  dan config seperti ini:
+
+  ![alt text](image-8.png)
+
+- lalu, `nano /etc/bind/jarkom/rujapala.it18.com` dan config seperti ini:
+
+  ![alt text](image-9.png)
+
+- jangan lupa untuk `service bind9 restart` setiap melakukan perubahan config
+
+2. kita dapat lakukan ping pada **terminal Client**
+
+### Client (Sanjaya)
+
+- setelah itu, kita bisa test ping `rujapala.it18.com` ataupun `www.rujapala.it18.com`
+
+![alt text](image-10.png)
+
+## Soal 5
+
+Pastikan domain-domain tersebut dapat diakses oleh seluruh komputer (client) yang berada di Nusantara.
+
+- untuk **Client Sanjaya** dapat lihat di soal 2, 3, dan 4
+- jangan lupa untuk lakukan ini pada terminal Client:
+
+```bash
+    echo 'nameserver 192.168.122.1' > /etc/resolv.conf
+    echo 'nameserver 192.242.1.3' >> /etc/resolv.conf #IP Sriwijaya sebagai dns-master
+
+	apt-get update
+```
+
+### Client Anusapati
+
+![alt text](image-11.png)
+
+### Client Jayanagara
+
+![alt text](image-12.png)
