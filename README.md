@@ -1071,8 +1071,7 @@ server {
 - Lakukan restart nginx
 
 #### Testing
-![image](https://github.com/user-attachments/assets/36fe2cf2-e880-4d83-9d80-ce56614911fd)
-
+![image](https://github.com/user-attachments/assets/d1e65cc3-45aa-4388-a15e-3fa9b7e91b0b)
 
 ### Soal 18
 Apa bila ada yang mencoba mengakses IP solok akan secara otomatis dialihkan ke www.solok.xxxx.com.
