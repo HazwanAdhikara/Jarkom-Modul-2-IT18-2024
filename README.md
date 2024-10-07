@@ -1010,6 +1010,8 @@ echo "BIND and Nginx configurations for ${DOMAIN} have been successfully updated
 ```
 
 - Testing dilakukan di salah satu client, dengan command ab -n [jumlah requests] -c 10 http://solok.it18.com/ atau ab -n [jumlah request] -c 10 http://www.solok.it18.com/.
+#### Testing
+![image](https://github.com/user-attachments/assets/b68dbe05-d802-4237-8031-231a62e35c91)
 
 ### Soal 17
 
