@@ -739,7 +739,7 @@ service apache2 start
 
 apt-get install apache2-utils
 ```
-**Lakukan Juga semua setup pada web server seperti nomer sebelumnya, berikut adalah contoh confignya :**
+**Lakukan juga semua setup pada web server seperti nomer sebelumnya, berikut adalah contoh confignya :**
 
 ```bash
 echo nameserver 192.168.122.1 > /etc/resolv.conf
@@ -815,7 +815,13 @@ echo "Tanggal saat ini: $date<br>";
 #### Testing
 
 1. Lakukan testing seperti pada nomer sebelumnya menggunakan `http://192.242.1.5/index.php`
-2. Hasil akan seperti pada nomer sebelumnya kurang lebihnya
+2. Hasil akan seperti ini
+![image](https://github.com/user-attachments/assets/897512be-ec1f-403c-95a6-34a49247b4c3)
+
+![image](https://github.com/user-attachments/assets/b2488cf9-fd09-453a-baf5-dc0307fd9345)
+
+![image](https://github.com/user-attachments/assets/5d87d58a-ac38-4a37-8f65-0710acc2647c)
+
 
 ### Soal 14
 Selama melakukan penjarahan mereka melihat bagaimana web server luar negeri, hal ini membuat mereka iri, dengki, sirik dan ingin flexing sehingga meminta agar web server dan load balancer nya diubah menjadi nginx.
@@ -908,6 +914,11 @@ service nginx restart
 #### Testing
 ![image](https://github.com/user-attachments/assets/881e0064-ca68-4315-a330-0f2a010de820)
 
+*Dan berikut adalah hasil testing load balancer*
+![image](https://github.com/user-attachments/assets/f0f7dfb8-b8e2-4b1e-9310-3bbec6a464ff)
+
+![image](https://github.com/user-attachments/assets/5c9afb0e-76a0-4d02-b2b6-91ea62a80039)
+
 
 ### Soal 15
 Markas pusat meminta laporan hasil benchmark dengan menggunakan apache benchmark dari load balancer dengan 2 web server yang berbeda tersebut dan meminta secara detail dengan ketentuan:
@@ -916,7 +927,7 @@ Markas pusat meminta laporan hasil benchmark dengan menggunakan apache benchmark
   - Grafik request per second untuk masing masing algoritma. 
   - Analisis
   - Meme terbaik kalian (terserah ( ͡° ͜ʖ ͡°)) 🤓
-
+**Sebenarnya saya melakukan pengujian satu satu terhadap load balancer,namun dibawah ini adalah ringkasan hasil uji tes dan juga analisis saya**
 #### Hasil Pengujian (Rata-rata Request per Second)
 
 Berikut adalah hasil pengujian performa load balancer menggunakan tiga algoritma berbeda, diukur menggunakan **Apache Benchmark** dengan parameter `-n 10000 -c 100`.
@@ -1094,4 +1105,110 @@ nginx -t
 
 service nginx restart
 ```
+*Dengan dijalankan script tersebut kita dapat melakukan testing lynx dari ip load balancer kita (solok)*
 
+ ![image](https://github.com/user-attachments/assets/3adffc40-236f-4a40-ae1c-14281c63ffdc)
+
+### Soal 19
+Karena probset sudah kehabisan ide masuk ke salah satu worker buatkan akses direktori listing yang mengarah ke resource worker2.
+
+Berikut langkah-langkah untuk membuat konfigurasi direktori listing dan DNS:
+
+#### Langkah 1: Edit Konfigurasi BIND
+- Akses file konfigurasi `named.conf.local`.
+- Tambahkan zona baru untuk domain `sekiantterimakasih.it18.com`.
+
+#### Langkah 2: Buat File Zona DNS
+- Buat direktori untuk file zona jika belum ada.
+- Buat file zona DNS untuk domain `sekiantterimakasih.it18.com` di direktori yang sesuai.
+- Konfigurasi file zona dengan informasi DNS yang diperlukan (NS, A, CNAME records).
+
+#### Langkah 3: Restart BIND
+- Restart layanan BIND untuk menerapkan perubahan konfigurasi.
+
+#### Langkah 4: Konfigurasi Nginx untuk Domain
+- Buat konfigurasi Nginx untuk domain `sekiantterimakasih.it18.com` di direktori `sites-available`.
+- Atur `root` direktori untuk mengarahkan ke folder yang berisi direktori listing.
+- Aktifkan autoindex di Nginx agar direktori listing terlihat.
+
+#### Langkah 5: Download dan Ekstrak File Direktori Listing
+- Unduh file zip dari link yang diberikan.
+- Ekstrak file zip tersebut ke dalam direktori sementara.
+
+#### Langkah 6: Pindahkan Direktori Listing
+- Buat direktori tujuan di dalam `/var/www/` untuk domain.
+- Pindahkan file hasil ekstraksi ke dalam direktori yang baru dibuat.
+
+#### Langkah 7: Restart Nginx
+- Restart layanan Nginx untuk menerapkan perubahan konfigurasi.
+
+**Dan berikut adalah script yang dijalankan (Penjelasan juga ada pada script)**
+
+```bash
+#!/bin/bash
+
+# Buat file zona baru di /etc/bind/named.conf.local
+echo 'zone "sekiantterimakasih.it18.com" {
+    type master;
+    file "/etc/bind/it18/sekiantterimakasih.it18.com";
+};' | sudo tee -a /etc/bind/named.conf.local
+
+# Buat file zona di /etc/bind/it18/sekiantterimakasih.it18.com
+sudo mkdir -p /etc/bind/it18
+sudo bash -c 'cat <<EOF > /etc/bind/it18/sekiantterimakasih.it18.com
+;
+; BIND data file for local loopback interface
+;
+\$TTL    604800
+@       IN      SOA     sekiantterimakasih.it18.com. root.sekiantterimakasih.it18.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      sekiantterimakasih.it18.com.
+@       IN      A       10.67.1.5
+www     IN      CNAME   sekiantterimakasih.it18.com.
+EOF'
+
+# Restart bind service
+sudo service bind9 restart
+
+# Buat konfigurasi Nginx di /etc/nginx/sites-available/cakra.sudarsana.it18.com
+sudo bash -c 'cat <<EOF > /etc/nginx/sites-available/cakra.sudarsana.it18.com
+server {
+    listen 80;
+    server_name sekiantterimakasih.it18.com www.sekiantterimakasih.it18.com;
+
+    root /var/www/sekiantterimakasih.it18.com/dir-listing/worker2;
+    index index.php index.html index.htm;
+
+    location / {
+        autoindex on;
+        try_files \$uri \$uri/ =404;
+    }
+}
+EOF'
+
+# Download file dir-listing.zip
+wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1JGk8b-tZgzAOnDqTx5B3F9qN6AyNs7Zy' -O dir-listing.zip
+
+# Unzip file dir-listing.zip
+unzip dir-listing.zip -d dir-listing
+
+# Buat direktori untuk web
+sudo mkdir -p /var/www/sekiantterimakasih.it18.com
+
+# Pindahkan file dir-listing ke direktori web
+sudo mv dir-listing/* /var/www/sekiantterimakasih.it18.com
+
+# Restart Nginx service
+sudo service nginx restart
+
+echo "Konfigurasi selesai dan server telah direstart."
+
+```
+
+### Soal 20
+Worker tersebut harus dapat di akses dengan sekiantterimakasih.xxxx.com dengan alias www.sekiantterimakasih.xxxx.com.
