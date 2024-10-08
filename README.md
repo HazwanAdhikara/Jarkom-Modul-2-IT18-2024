@@ -887,9 +887,9 @@ apt-get install nginx -y
 # Buat konfigurasi Nginx untuk upstream dan server
 cat <<EOL > /etc/nginx/sites-available/solok
 upstream webserver {
-    server 10.67.1.4;
-    server 10.67.1.5;
-    server 10.67.1.6;
+    server 192.242.1.4;
+    server 192.242.1.5;
+    server 192.242.1.6;
 }
 
 server {
@@ -1168,7 +1168,7 @@ sudo bash -c 'cat <<EOF > /etc/bind/it18/sekiantterimakasih.it18.com
                          604800 )       ; Negative Cache TTL
 ;
 @       IN      NS      sekiantterimakasih.it18.com.
-@       IN      A       10.67.1.5
+@       IN      A       192.242.1.5
 www     IN      CNAME   sekiantterimakasih.it18.com.
 EOF'
 
